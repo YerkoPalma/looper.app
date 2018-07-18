@@ -11,6 +11,26 @@ function store (state, emitter) {
   state.sourceStream = {}
   state.chunks = []
   state.buffers = []
+  emitter.on('DOMContentLoaded', function () {
+    var hidden, visibilityChange;
+    if (typeof document.hidden !== 'undefined') { 
+      hidden = 'hidden'
+      visibilityChange = 'visibilitychange'
+    } else if (typeof document.msHidden !== 'undefined') {
+      hidden = 'msHidden'
+      visibilityChange = 'msvisibilitychange'
+    } else if (typeof document.webkitHidden !== 'undefined') {
+      hidden = 'webkitHidden'
+      visibilityChange = 'webkitvisibilitychange'
+    }
+    document.addEventListener(visibilityChange, function () {
+      if (document[hidden]) {
+        graph.stop()
+      } else {
+        graph.play()
+      }
+    })
+  })
   emitter.on('startcapturing', function () {
     if (navigator.mediaDevices) {
       navigator.mediaDevices.getUserMedia({audio: true, video: false})
